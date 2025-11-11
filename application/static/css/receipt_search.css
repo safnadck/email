@@ -1,0 +1,379 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 70px;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.brand-logo {
+  margin-top: 2%;
+  width: 150px;
+  height: auto;
+  max-height: 40px;
+  margin-left: 20px;
+}
+
+.user-panel {
+  position: relative;
+  margin-top: 2%;
+  display: flex;
+  align-items: center;
+  background-color: rgba(22, 55, 109, 0.1);
+  padding: 10px 16px;
+  border-radius: 14px;
+  color: #16376D;
+  gap: 8px;
+  font-size: 14px;
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
+  min-width: 120px;
+  z-index: 1000;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #16376D;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.user-name {
+  font-size: 15px;
+  text-transform: capitalize;
+  font-weight: 700;
+}
+
+.profile {
+  font-size: 25px;
+}
+
+/* Sidebar */
+.sidebar-menu {
+  position: fixed;
+  top: 127px;
+  left: 20px;
+  width: 80px;
+  height: calc(100vh - 70px);
+  background-color: white;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+.sidebar-menu.sidebar-open {
+  width: 250px;
+}
+
+.menu-wrapper {
+  padding: 1rem;
+}
+
+.menu-item {
+  background-color: rgba(22, 55, 109, 0.09);
+  border-radius: 14px;
+  margin-bottom: 0.75rem;
+  transition: background-color 0.3s ease;
+}
+
+.menu-item:hover {
+  background-color: rgba(254, 255, 115, 0.57);
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.6rem 0.6rem;
+  text-decoration: none;
+  color: #16376D;
+  gap: 12px;
+  white-space: nowrap;
+  transition: padding 0.3s ease;
+}
+
+.sidebar-menu.sidebar-open .menu-link {
+  padding: 0.6rem 1rem;
+}
+.menu-icon {
+  color: #16376D;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-text {
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-menu.sidebar-open .menu-text {
+  opacity: 1;
+}
+
+
+.sidebar-toggle {
+  position: fixed;
+  top: 85px;
+  left: 35px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #fff;
+  border: 1px solid #16376D;
+  color: #16376D;
+  padding: 9px 14px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.sidebar-toggle:hover {
+  background-color: #16376D;
+  color: #fff;
+}
+
+/* Main content */
+.page-content {
+  margin-left: 80px;
+  margin-top: 50px;
+  padding: 2rem;
+  min-height: calc(100vh - 70px);
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar-menu.sidebar-open ~ .page-content {
+  margin-left: 250px;
+}
+
+/* Navigation Buttons */
+.register-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 15px;
+}
+
+.right-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.left-buttons {
+  display: flex;
+  justify-content: flex-start;
+  margin-right: auto;
+  min-height: 40px;
+}
+
+.backbutton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #fff;
+  border: 1px solid #16376D;
+  color: #16376D;
+  padding: 10px 20px;
+  border-radius: 14px;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+/* Centered Search Section */
+.search-section {
+  background-color: white;
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  margin: 2rem auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+ 
+  text-align: center;
+  animation: fadeIn 0.4s ease;
+}
+
+.search-title {
+  color: #16376D;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.search-box {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 500px;
+  padding: 14px 18px;
+  border: 2px solid #16376D;
+  border-radius: 50px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0px 2px 6px rgba(22, 55, 109, 0.15);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #0e2a52;
+  box-shadow: 0px 4px 12px rgba(22, 55, 109, 0.25);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* Table */
+.table-wrapper {
+  background-color: white;
+  border-radius: 14px;
+  overflow-x: auto;
+  margin: 0 auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.results-table {
+  text-align: center;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.results-table thead {
+  background-color: #16376D;
+  color: white;
+}
+
+.results-table thead th {
+  padding: 13px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.results-table tbody td {
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.results-table tbody tr {
+  background-color: rgba(22, 55, 109, 0.08);
+  border-bottom: 2px solid white;
+}
+
+.results-table tbody tr:hover {
+  background-color: rgba(254, 255, 115, 0.57);
+}
+
+.results-table td:first-child,
+.results-table th:first-child {
+  text-align: left;
+  padding-left: 40px;
+}
+
+.results-table td:last-child,
+.results-table th:last-child {
+  text-align: center;
+  padding-right: 40px;
+}
+
+.view-link {
+  color: #16376D;
+  border: 1px solid #16376D;
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.view-link:hover {
+  background-color: #16376D;
+  color: white;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .page-content {
+    margin-left: 80px;
+    padding: 1rem;
+  }
+
+  .results-table {
+    font-size: 14px;
+  }
+
+  .results-table thead th,
+  .results-table tbody td {
+    padding: 0.75rem;
+  }
+
+  .search-input {
+    font-size: 14px;
+  }
+}

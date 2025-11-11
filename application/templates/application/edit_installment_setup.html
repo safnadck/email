@@ -1,0 +1,575 @@
+{% load static %}
+{% load permission_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Installment Setup</title>
+    <link rel="stylesheet" href="{% static 'css/edit_installment_setup.css' %}">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+
+</head>
+<body>
+
+<header class="navbar">
+    <a href="{% url 'application:homepage' %}" class="navbar-left">
+        <img src="{% static 'images/tutorlogo.png' %}" alt="Tutor Logo" class="brand-logo">
+    </a>
+
+    <div class="user-panel">
+        <span class="iconify profile" data-icon="iconamoon:profile-fill"></span>
+        <span class="user-name">Admin</span>
+
+        <div class="dropdown-menu">
+            <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+        </div>
+    </div>
+</header>
+
+  <aside class="sidebar-menu">
+    <div class="menu-wrapper">
+      {% if show_reports_button %}
+      <div class="menu-item">
+        <a href="{% url 'application:homepage' %}" class="menu-link">
+          <span class="iconify menu-icon" data-icon="iconoir:reports-solid"></span>
+          <span class="menu-text">Reports</span>
+        </a>
+      </div>
+      {% endif %}
+      {% if show_franchise_button %}
+      <div class="menu-item">
+        <a href="{% url 'application:franchise_list' %}" class="menu-link">
+          <span class="iconify menu-icon" data-icon="fa-solid:school"></span>
+          <span class="menu-text">Franchise</span>
+        </a>
+      </div>
+      {% endif %}
+      {% if show_receipt_button %}
+      <div class="menu-item">
+        <a href="{% url 'application:receipt_search' %}" class="menu-link">
+          <span class="iconify menu-icon" data-icon="fluent:reciept-24-filled"></span>
+          <span class="menu-text">Reciept</span>
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </aside>
+
+<main class="page-content">
+    <div class="register-wrapper">
+        <div class="left-buttons">
+            <a href="{% url 'application:student_fee_management' franchise.pk batch.pk user.pk %}" class="backbutton">
+                <span class="iconify" data-icon="weui:back-filled" style="font-size: 20px;"></span>
+            </a>
+                       <button class="sidebar-toggle">
+      <span class="iconify" data-icon="mdi:menu" style="font-size: 20px;"></span>
+        </button>
+        </div>
+    </div>
+    
+    <div class="form-card">
+        <h2 style="color: #16376D; padding-top: 25px; font-size: 30px;">Edit Installment Setup for {{ user.username }}</h2>
+        
+        <div class="info-box">
+            <p><strong>Batch:</strong> {{ batch.batch_no }} - {{ batch.course.display_name }}</p>
+            <p><strong>Total Fees:</strong> ₹{{ batch.fees }}</p>
+            <p><strong>Batch Discount:</strong> ₹{{ batch_discount }}</p>
+            <p><strong>Additional Discount:</strong> ₹{{ additional_discount }}</p>
+            <p><strong>Total Discount:</strong> ₹{{ total_discount }}</p>
+            <p><strong>Net Payable Amount:</strong> ₹{{ student_fee.remaining_amount }}</p>
+            <p><strong>Registration Date:</strong> {{ enrollment.created.date }}</p>
+            <p></p>
+        </div>
+
+
+      
+
+        <div class="realtime-calculation">
+            <h4>Real-time Calculation</h4>
+            <p><strong>Current Total:</strong> ₹<span id="realtime-total">0.00</span></p>
+            <p><strong>Current Balance:</strong> ₹<span id="realtime-balance">0.00</span></p>
+            <p id="realtime-message" style="font-weight: bold;"></p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags %}{{ message.tags }}{% else %}success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="discount-section">
+            <h3>Edit Student Discount</h3>
+            <form method="post" class="discount-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="save_discount">
+                <label for="{{ discount_form.additional_discount.id_for_label }}">{{ discount_form.additional_discount.label }}</label>
+                {{ discount_form.additional_discount }}
+                {% if discount_form.additional_discount.errors %}
+                    <div class="form-errors">
+                        {% for error in discount_form.additional_discount.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <button type="submit">Save Discount</button>
+            </form>
+        </div>
+
+        <form method="post" id="installment-form">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            
+            {% if formset.non_form_errors %}
+                <div class="errors">
+                    <h4>Please fix the following errors:</h4>
+                    {% for error in formset.non_form_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <table class="installment-table" id="installment-table">
+                <thead>
+                    <tr>
+                        <th>Amount (₹)</th>
+                        <th>Paid within (days)</th>
+                        <th>Paid Amount (₹)</th>
+                        
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody id="installment-tbody">
+    {% for form in formset %}
+        <tr class="installment-row">
+            <td>
+                {{ form.id }}
+                {% if form.instance.status == "paid" %}
+                    <span>{{ form.instance.amount }}</span>
+                    <input type="hidden" name="{{ form.amount.html_name }}" value="{{ form.instance.amount }}">
+                {% else %}
+                    {{ form.amount }}
+                {% endif %}
+                {% if form.amount.errors %}
+                    <div class="form-errors">
+                        {% for error in form.amount.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </td>
+             <td>
+                {% if form.instance.status == "paid" %}
+                    <span>{{ form.instance.repayment_period_days }}</span>
+                    <input type="hidden" name="{{ form.repayment_period_days.html_name }}" value="{{ form.instance.repayment_period_days }}">
+                {% else %}
+                    {{ form.repayment_period_days }}
+                {% endif %}
+                {% if form.repayment_period_days.errors %}
+                    <div class="form-errors">
+                        {% for error in form.repayment_period_days.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </td>
+            <td>
+                {% if form.instance.status == "paid" %}
+                    <span>{{ form.instance.payed_amount }}</span>
+                    <input type="hidden" name="{{ form.payed_amount.html_name }}" value="{{ form.instance.payed_amount }}">
+                {% else %}
+                    <span>{{ form.instance.payed_amount|default:"0.00" }}</span>
+                {% endif %}
+            </td>
+           
+            <td>
+                {% if form.instance.due_date %}
+                    {{ form.instance.due_date }}
+                {% else %}
+                    <em>Will be calculated after save</em>
+                {% endif %}
+            </td>
+            <td>
+                {{ form.instance.get_status_display|default:"Pending" }}
+            </td>
+            <td style="text-align: center;">
+                {% if form.instance.status == "paid" %}
+                    <em>Locked</em>
+                {% else %}
+                    <input type="hidden" name="{{ form.DELETE.html_name }}" value="">
+                    <button type="button" class="delete-button" data-row-id="{{ form.instance.id|default:forloop.counter }}">
+                        <span class="iconify" data-icon="mdi:delete" style="font-size: 16px;"></span>
+                        Delete
+                    </button>
+                    <button type="button" class="redo-button" data-row-id="{{ form.instance.id|default:forloop.counter }}" style="display:none;">
+                        <span class="iconify" data-icon="mdi:redo" style="font-size: 16px;"></span>
+                        Redo
+                    </button>
+                {% endif %}
+            </td>
+        </tr>
+        {% if form.non_field_errors %}
+            <tr>
+                <td colspan="5" class="errors">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+</tbody>
+
+            </table>
+
+            <div style="margin: 25px 0;">
+                <button type="button" id="add-installment">Add New Installment</button>
+                <button type="submit" id="save-button" style="background-color: #28a745;">Save Changes</button>
+            </div>
+        </form>
+
+        <a href="{% url 'application:student_fee_management' franchise.pk batch.pk user.pk %}" class="back-link">
+            ← Back to Fee Management
+        </a>
+    </div>
+
+
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tbody = document.getElementById('installment-tbody');
+        const addButton = document.getElementById('add-installment');
+        const saveButton = document.getElementById('save-button');
+        const totalFormsInput = document.querySelector('#id_form-TOTAL_FORMS');
+        const remainingAmount = parseFloat('{{ student_fee.remaining_amount }}');
+        let formCount = parseInt(totalFormsInput.value);
+
+        // Real-time calculation elements
+        const realtimeTotalSpan = document.getElementById('realtime-total');
+        const realtimeBalanceSpan = document.getElementById('realtime-balance');
+        const realtimeMessage = document.getElementById('realtime-message');
+        const calculationBox = document.getElementById('calculation-box');
+
+        // Function to update real-time calculations
+        function updateRealtimeCalculations() {
+            let total = 0;
+            const amountInputs = document.querySelectorAll('input[name$="-amount"]');
+
+            amountInputs.forEach(input => {
+                // Only count amounts that are not marked for deletion
+                const deleteInput = document.querySelector(`input[name="${input.name.replace('amount', 'DELETE')}"]`);
+                if (!deleteInput || deleteInput.value !== "on") {
+                    total += parseFloat(input.value) || 0;
+                }
+            });
+
+            const balance = remainingAmount - total;
+            
+            // Update real-time display
+            realtimeTotalSpan.textContent = total.toFixed(2);
+            realtimeBalanceSpan.textContent = balance.toFixed(2);
+            
+            // Update message and styling
+            if (balance > 0) {
+                realtimeMessage.textContent = `You need to add ₹${balance.toFixed(2)} to match the remaining amount.`;
+                realtimeMessage.style.color = '#28a745';
+                calculationBox.classList.remove('exceeded');
+                saveButton.disabled = false;
+            } else if (balance < 0) {
+                realtimeMessage.textContent = `You have exceeded the remaining amount by ₹${Math.abs(balance).toFixed(2)}.`;
+                realtimeMessage.style.color = '#dc3545';
+                calculationBox.classList.add('exceeded');
+                saveButton.disabled = true;
+            } else {
+                realtimeMessage.textContent = 'Installment amount matches the remaining amount perfectly.';
+                realtimeMessage.style.color = '#28a745';
+                calculationBox.classList.remove('exceeded');
+                saveButton.disabled = false;
+            }
+        }
+
+        
+        // Function to add event listeners to an input
+        function addInputListeners(input) {
+            if (input.name.includes('amount')) {
+                input.addEventListener('input', function() {
+                    validateAmount(this);
+                    updateRealtimeCalculations();
+                });
+            } else if (input.name.includes('repayment_period_days')) {
+                input.addEventListener('input', validateDays);
+            }
+        }
+
+        // Function to validate amount
+        function validateAmount(input) {
+            const amount = parseFloat(input.value) || 0;
+            
+            if (amount <= 0) {
+                input.setCustomValidity('Amount must be greater than 0');
+                input.classList.add('field-error');
+            } else {
+                input.setCustomValidity('');
+                input.classList.remove('field-error');
+            }
+        }
+
+        // Function to validate repayment days
+        function validateDays(event) {
+            const input = event.target;
+            const days = parseInt(input.value) || 0;
+            
+            if (days < 0) {
+                input.setCustomValidity('Repayment days cannot be negative');
+                input.classList.add('field-error');
+            } else {
+                input.setCustomValidity('');
+                input.classList.remove('field-error');
+            }
+        }
+
+        // Function to add a new installment row
+        function addInstallmentRow() {
+            const newRow = document.createElement('tr');
+            newRow.className = 'installment-row';
+            newRow.innerHTML = `
+
+                 <td>
+                    <input type="number" step="0.01" min="0.01" name="form-${formCount}-amount"
+                           id="id_form-${formCount}-amount" placeholder="0.00"
+                           class="amount-input">
+                </td>
+                
+                <td>
+                    <input type="number" min="0" name="form-${formCount}-repayment_period_days"
+                           id="id_form-${formCount}-repayment_period_days" placeholder="Days"
+                           class="days-input">
+                </td>
+
+                <td>
+                    <span>0.00</span>
+                </td>
+
+
+               
+                
+                <td><em>Will be calculated after save</em></td>
+                <td>Pending</td>
+                <td style="text-align: center;">
+                    <input type="hidden" name="form-${formCount}-DELETE" value="">
+                    <button type="button" class="delete-button" data-row-id="${formCount}">
+                        <span class="iconify" data-icon="mdi:delete" style="font-size: 16px;"></span>
+                        Delete
+                    </button>
+                    <button type="button" class="redo-button" data-row-id="${formCount}" style="display:none;">
+                        <span class="iconify" data-icon="mdi:redo" style="font-size: 16px;"></span>
+                        Redo
+                    </button>
+                    <input type="hidden" name="form-${formCount}-id" value="">
+                </td>
+            `;
+            tbody.appendChild(newRow);
+
+            // Update management form
+            totalFormsInput.value = formCount + 1;
+            formCount++;
+
+            // Add event listeners to the new inputs
+            const newAmountInput = newRow.querySelector('.amount-input');
+            const newDaysInput = newRow.querySelector('.days-input');
+            const deleteButton = newRow.querySelector('.delete-button');
+
+            addInputListeners(newAmountInput);
+            addInputListeners(newDaysInput);
+
+            deleteButton.addEventListener('click', function() {
+                if (!confirm('Did you want to delete this installment?')) {
+                    return;
+                }
+                const row = this.closest('.installment-row');
+                const hiddenInput = row.querySelector('input[type="hidden"][name$="-DELETE"]');
+                if (hiddenInput) {
+                    hiddenInput.value = "on";
+                }
+                row.classList.add('deleted');
+                this.style.display = 'none';
+                const redoButton = row.querySelector('.redo-button');
+                if (redoButton) {
+                    redoButton.style.display = 'inline-flex';
+                }
+                updateRealtimeCalculations();
+            });
+
+            redoButton.addEventListener('click', function() {
+                const row = this.closest('.installment-row');
+                const hiddenInput = row.querySelector('input[type="hidden"][name$="-DELETE"]');
+                if (hiddenInput) {
+                    hiddenInput.value = "";
+                }
+                row.classList.remove('deleted');
+                this.style.display = 'none';
+                const deleteButton = row.querySelector('.delete-button');
+                if (deleteButton) {
+                    deleteButton.style.display = 'inline-flex';
+                }
+                updateRealtimeCalculations();
+            });
+
+            // Focus on the new amount input
+            newAmountInput.focus();
+
+            // Update calculations
+            updateRealtimeCalculations();
+        }
+
+        // Function to update row visibility based on delete status
+        function updateRowVisibility(row) {
+            const hiddenInput = row.querySelector('input[type="hidden"][name$="-DELETE"]');
+            if (hiddenInput && hiddenInput.value === "on") {
+                row.style.display = "none";
+            } else {
+                row.style.display = "";
+            }
+        }
+
+        // Add event listeners to all existing inputs
+        function initializeInputListeners() {
+            // Add listeners to all amount and days inputs
+            const allInputs = document.querySelectorAll('input[name$="-amount"], input[name$="-repayment_period_days"]');
+            allInputs.forEach(input => {
+                addInputListeners(input);
+            });
+
+            // Add listeners to all delete buttons
+            const deleteButtons = document.querySelectorAll('.delete-button');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if (!confirm('Did you want to delete this installment?')) {
+                        return;
+                    }
+                    const row = this.closest('.installment-row');
+                    const hiddenInput = row.querySelector('input[type="hidden"][name$="-DELETE"]');
+                    if (hiddenInput) {
+                        hiddenInput.value = "on";
+                    }
+                    row.classList.add('deleted');
+                    this.style.display = 'none';
+                    const redoButton = row.querySelector('.redo-button');
+                    if (redoButton) {
+                        redoButton.style.display = 'inline-flex';
+                    }
+                    updateRealtimeCalculations();
+                });
+            });
+
+            // Add listeners to all redo buttons
+            const redoButtons = document.querySelectorAll('.redo-button');
+            redoButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('.installment-row');
+                    const hiddenInput = row.querySelector('input[type="hidden"][name$="-DELETE"]');
+                    if (hiddenInput) {
+                        hiddenInput.value = "";
+                    }
+                    row.classList.remove('deleted');
+                    this.style.display = 'none';
+                    const deleteButton = row.querySelector('.delete-button');
+                    if (deleteButton) {
+                        deleteButton.style.display = 'inline-flex';
+                    }
+                    updateRealtimeCalculations();
+                });
+            });
+        }
+
+        // Add installment button
+        addButton.addEventListener('click', addInstallmentRow);
+
+
+
+        // Form submission validation
+        const form = document.getElementById('installment-form');
+        form.addEventListener('submit', function(event) {
+            let hasErrors = false;
+
+            // Validate individual fields
+            document.querySelectorAll('.amount-input, .days-input').forEach(input => {
+                if (!input.checkValidity()) {
+                    input.classList.add('field-error');
+                    input.reportValidity();
+                    hasErrors = true;
+                } else {
+                    input.classList.remove('field-error');
+                }
+            });
+
+            // Check if total matches remaining amount exactly
+            const total = parseFloat(realtimeTotalSpan.textContent);
+            if (total !== remainingAmount) {
+                event.preventDefault();
+                 alert('Total installment amount must equal remaining amount. Please adjust the installment amounts.');                hasErrors = true;
+            }
+
+            if (hasErrors) {
+                event.preventDefault();
+            }
+        });
+
+        // Initialize all event listeners and calculations
+        initializeInputListeners();
+        updateRealtimeCalculations();
+    });
+
+    // User panel dropdown functionality
+    const userPanel = document.querySelector('.user-panel');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+    const sidebar = document.querySelector('.sidebar-menu');
+    const toggleButton = document.querySelector('.sidebar-toggle');
+
+    // Toggle dropdown on click
+    userPanel.addEventListener('click', function(event) {
+        event.stopPropagation(); // prevent click from bubbling
+        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+        dropdownMenu.style.display = 'none';
+    });
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".installment-row input[type='checkbox']").forEach(checkbox => {
+        checkbox.addEventListener("change", function() {
+            const row = this.closest(".installment-row");
+            if (this.checked) {
+                row.style.display = "none";   // visually remove
+            } else {
+                row.style.display = "";       // restore if unchecked
+            }
+        });
+    });
+
+
+    // Toggle sidebar on button click
+    toggleButton.addEventListener('click', function() {
+      sidebar.classList.toggle('sidebar-open');
+      const icon = toggleButton.querySelector('.iconify');
+      if (sidebar.classList.contains('sidebar-open')) {
+        icon.setAttribute('data-icon', 'mdi:close');
+      } else {
+        icon.setAttribute('data-icon', 'mdi:menu');
+      }
+    });
+
+
+});
+</script>
+
+</body>
+</html>

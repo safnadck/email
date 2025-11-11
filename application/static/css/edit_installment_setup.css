@@ -1,0 +1,682 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 70px;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.brand-logo {
+  margin-top: 2%;
+  width: 150px;
+  height: auto;
+  max-height: 40px;
+  margin-left: 20px;
+}
+
+.user-panel {
+  position: relative;
+  margin-top: 2%;
+  display: flex;
+  align-items: center;
+  background-color: rgba(22, 55, 109, 0.1);
+  padding: 10px 16px;
+  border-radius: 14px;
+  color: #16376D;
+  gap: 8px;
+  font-size: 14px;
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
+  min-width: 120px;
+  z-index: 1000;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #16376D;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.user-name {
+  font-size: 15px;
+  text-transform: capitalize;
+  font-weight: 700;
+}
+
+.profile {
+  font-size: 25px;
+}
+
+/* Sidebar */
+.sidebar-menu {
+  position: fixed;
+  top: 127px;
+  left: 20px;
+  width: 80px; 
+  height: calc(100vh - 70px);
+  background-color: white;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+.sidebar-menu.sidebar-open {
+  width: 250px;
+}
+
+.menu-wrapper {
+  padding: 1rem;
+}
+
+.menu-item {
+  background-color: rgba(22, 55, 109, 0.09);
+  border-radius: 14px;
+  margin-bottom: 0.75rem;
+  transition: background-color 0.3s ease;
+}
+
+.menu-item:hover {
+  background-color: rgba(254, 255, 115, 0.57);
+}
+
+.register-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 15px;
+}
+
+.right-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.left-buttons {
+  display: flex;
+  justify-content: flex-start;
+  margin-right: auto;
+}
+
+.backbutton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #fff;
+  border: 1px solid #16376D;
+  color: #16376D;
+  padding: 10px 20px;
+  border-radius: 14px;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.register-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(120deg, #16376D 50%, rgba(255, 254, 39, 1) 50%);
+  background-size: 200% 200%;
+  background-position: top left; 
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 14px;
+  text-decoration: none;
+  font-size: 15px;
+  transition: background-position 0.5s ease, color 0.3s ease;
+}
+
+.register-button:hover {
+  background-position: bottom right; 
+  color: #16376D;
+}
+
+.plus-icon {
+  font-size: 24px;  
+  font-weight: 700;  
+  line-height: 1;   
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.6rem 0.6rem;
+  text-decoration: none;
+  color: #16376D;
+  gap: 12px;
+  white-space: nowrap;
+  transition: padding 0.3s ease;
+}
+
+.sidebar-menu.sidebar-open .menu-link {
+  padding: 0.6rem 1rem;
+}
+
+.menu-icon {
+  color: #16376D;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-text {
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-menu.sidebar-open .menu-text {
+  opacity: 1;
+}
+
+.sidebar-toggle {
+  position: fixed;
+  top: 85px;
+  left: 35px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #fff;
+  border: 1px solid #16376D;
+  color: #16376D;
+  padding: 9px 14px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.sidebar-toggle:hover {
+  background-color: #16376D;
+  color: #fff;
+}
+
+
+/* Main content */
+.page-content {
+  margin-left: 80px;
+  margin-top: 50px;
+  padding: 2rem;
+  min-height: calc(100vh - 70px);
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar-menu.sidebar-open ~ .page-content {
+  margin-left: 250px;
+}
+
+
+/* Content Sections */
+.form-card {
+  background-color: white;
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-card h2 {
+  color: #16376D;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.info-box {
+  background-color: rgba(22, 55, 109, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.info-box p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.info-box strong {
+  color: #16376D;
+  font-weight: 600;
+}
+
+.realtime-calculation {
+  background-color: rgba(22, 55, 109, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.realtime-calculation h4 {
+  color: #16376D;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.realtime-calculation p {
+  margin: 0.25rem 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.realtime-calculation strong {
+  color: #16376D;
+  font-weight: 600;
+}
+
+/* Perfectly Aligned Table */
+.installment-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  table-layout: fixed; /* Ensures consistent column widths */
+}
+
+.installment-table thead {
+  background-color: #16376D;
+  color: white;
+}
+
+.installment-table th,
+.installment-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+/* Perfect column width distribution */
+.installment-table th:nth-child(1),
+.installment-table td:nth-child(1) {
+  width: 18%; /* Amount */
+}
+
+.installment-table th:nth-child(2),
+.installment-table td:nth-child(2) {
+  width: 15%; /* Paid Amount */
+}
+
+.installment-table th:nth-child(3),
+.installment-table td:nth-child(3) {
+  width: 15%; /* Repayment Days */
+}
+
+.installment-table th:nth-child(4),
+.installment-table td:nth-child(4) {
+  width: 20%; /* Due Date */
+}
+
+.installment-table th:nth-child(5),
+.installment-table td:nth-child(5) {
+  width: 15%; /* Status */
+}
+
+.installment-table th:nth-child(6),
+.installment-table td:nth-child(6) {
+  width: 17%; /* Delete */
+  text-align: center;
+}
+
+.installment-table tbody tr {
+  background-color: rgba(22, 55, 109, 0.08);
+}
+
+.installment-table tbody tr:hover {
+  background-color: rgba(254, 255, 115, 0.57);
+}
+
+/* Input field styling for perfect alignment */
+.installment-table input[type="number"] {
+  width: 120px;
+  padding: 8px 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: rgba(22, 55, 109, 0.14);
+  font-size: 14px;
+}
+
+.installment-table input[type="number"]:focus {
+  outline: none;
+  border-color: #16376D;
+  box-shadow: 0 0 0 2px rgba(22, 55, 109, 0.2);
+}
+
+/* Ensure text content is properly aligned */
+.installment-table td {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Center align the action buttons */
+.installment-table td:last-child {
+  text-align: center;
+}
+
+.delete-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background-color 0.3s ease;
+  min-width: 100px;
+}
+
+.delete-button:hover {
+  background-color: #b02a37;
+  transform: translateY(-1px);
+}
+
+.redo-button {
+  background-color: #ffc107;
+  color: #212529;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background-color 0.3s ease;
+  min-width: 100px;
+}
+
+.redo-button:hover {
+  background-color: #e0a800;
+  transform: translateY(-1px);
+}
+
+/* Form elements styling */
+.form-errors {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.errors {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.errors h4 {
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.errors p {
+  margin: 0.25rem 0;
+}
+
+.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.back-link {
+  display: inline-block;
+  color: #16376D;
+  text-decoration: none;
+  font-weight: 600;
+  margin-top: 1rem;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+  background-color: rgba(22, 55, 109, 0.1);
+}
+
+/* Button styles */
+#add-installment,
+#save-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-right: 10px;
+  min-width: 150px;
+}
+
+#add-installment {
+  background-color: #ffffff;
+  color: #16376D;
+  border: 2px solid #16376D;
+}
+
+#add-installment:hover {
+  background-color: #16376D;
+  color: white;
+  transform: translateY(-1px);
+}
+
+#save-button {
+  background-color: #28a745;
+  color: white;
+}
+
+#save-button:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+#save-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.deleted td {
+  text-decoration: line-through;
+  color: #888;
+  background-color: rgba(108, 117, 125, 0.1);
+}
+
+/* Discount Section */
+.discount-section {
+  background-color: rgba(22, 55, 109, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.discount-section h3 {
+  color: #16376D;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+/* Discount Form */
+.discount-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 1rem;
+}
+
+.discount-form label {
+  font-weight: 600;
+  color: #16376D;
+  font-size: 14px;
+}
+
+.discount-form input {
+  width: 280px;
+  padding: 8px 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: rgba(22, 55, 109, 0.14);
+  font-size: 14px;
+}
+
+.discount-form input:focus {
+  outline: none;
+  border-color: #16376D;
+  box-shadow: 0 0 0 2px rgba(22, 55, 109, 0.2);
+}
+
+.discount-form button {
+  background-color: #16376D;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.discount-form button:hover {
+  background-color: #122d59;
+}
+
+
+/* Responsive design */
+@media screen and (max-width: 1104px) {
+  .page-content {
+    margin-left: 80px;
+    padding: 1rem;
+  }
+
+  .form-card {
+    padding: 1rem;
+  }
+
+  .form-card h2 {
+    font-size: 1.25rem;
+  }
+
+  .installment-table {
+    font-size: 12px;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .installment-table th,
+  .installment-table td {
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+
+  #add-installment,
+  #save-button {
+    padding: 10px 20px;
+    font-size: 13px;
+    min-width: 120px;
+  }
+
+  .delete-button,
+  .redo-button {
+    padding: 6px 12px;
+    font-size: 12px;
+    min-width: 80px;
+  }
+
+  .discount-form {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .discount-form input {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .installment-table {
+    font-size: 11px;
+  }
+
+  .installment-table th,
+  .installment-table td {
+    padding: 6px 8px;
+  }
+
+  #add-installment,
+  #save-button {
+    width: 100%;
+    margin-bottom: 10px;
+    margin-right: 0;
+  }
+}

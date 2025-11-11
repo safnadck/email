@@ -1,0 +1,122 @@
+{% load static %}
+{% load permission_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register Franchise</title>
+    <link rel="stylesheet" href="{% static 'css/franchise_register.css' %}">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+</head>
+<body>
+
+     <header class="navbar">
+    <a href="{% url 'application:homepage' %}" class="navbar-left">
+      <img src="{% static 'images/tutorlogo.png' %}" alt="Tutor Logo" class="brand-logo">
+    </a>
+
+   <div class="user-panel">
+  <span class="iconify profile" data-icon="iconamoon:profile-fill"></span>
+  <span class="user-name">{{ user.username }}</span>
+
+ 
+  <div class="dropdown-menu">
+    <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+  </div>
+</div>
+ 
+    
+  </header>
+
+
+     <aside class="sidebar-menu">
+    <div class="menu-wrapper">
+
+          {% if user|can_access:'view_dashboard' %}
+      <div class="menu-item">
+        <a href="{% url 'application:homepage' %}" class="menu-link">
+          <span class="iconify menu-icon" data-icon="iconoir:reports-solid"></span>
+          <span class="menu-text">Reports</span>
+        </a>
+      </div>
+      {% endif %}
+
+      {% if user|can_access:'view_franchise' %}
+      <div class="menu-item">
+        <a href="{% url 'application:franchise_list' %}" class="menu-link">
+          <span class="iconify menu-icon" data-icon="fa-solid:school"></span>
+          <span class="menu-text">Franchise</span>
+        </a>
+      </div>
+      {% endif %}
+      {% if user|can_access:'process_payment' %}
+      <div class="menu-item">
+        <a href="{% url 'application:receipt_search' %}" class="menu-link">
+          <span class="iconify menu-icon" data-icon="fluent:reciept-24-filled"></span>
+          <span class="menu-text">Reciept</span>
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </aside>
+
+ <main class="page-content">
+  <div class="register-wrapper">
+   <div class="left-buttons">
+        <a href="{% url 'application:franchise_list' %}" class="backbutton">
+          <span class="iconify" data-icon="weui:back-filled" style="font-size: 20px;"></span>
+        </a>
+          <button class="sidebar-toggle">
+      <span class="iconify" data-icon="mdi:menu" style="font-size: 20px;"></span>
+        </button>
+      </div>
+  </div>
+
+  <div class="form-card">
+    <h1 class="heading" style="font-size: 32px;">Franchise Registration</h1>
+    <form method="post">
+      {% csrf_token %}
+      
+
+      {{ form.name }}
+      {{ form.location }}
+      {{ form.coordinator}}
+      {{ form.contact_no }}
+      {{ form.email }}
+      {{ form.registration_date }}
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+</main>
+  <script>
+    const userPanel = document.querySelector('.user-panel');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+    const sidebar = document.querySelector('.sidebar-menu');
+    const toggleButton = document.querySelector('.sidebar-toggle');
+
+
+    // Toggle dropdown on click
+    userPanel.addEventListener('click', function(event) {
+      event.stopPropagation(); // prevent click from bubbling
+      dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+      dropdownMenu.style.display = 'none';
+    });
+
+     // Toggle sidebar on button click
+    toggleButton.addEventListener('click', function() {
+      sidebar.classList.toggle('sidebar-open');
+      const icon = toggleButton.querySelector('.iconify');
+      if (sidebar.classList.contains('sidebar-open')) {
+        icon.setAttribute('data-icon', 'mdi:close');
+      } else {
+        icon.setAttribute('data-icon', 'mdi:menu');
+      }
+    });
+  </script>
+
+</body>
+</html>

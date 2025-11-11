@@ -1,0 +1,243 @@
+
+{% load static %}
+{% load permission_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Details - {{ user.get_full_name|default:user.username }}</title>
+  <link rel="stylesheet" href="{% static 'css/student_details.css' %}">
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="{% url 'application:homepage' %}" class="navbar-left">
+      <img src="{% static 'images/tutorlogo.png' %}" alt="Tutor Logo" class="brand-logo">
+    </a>
+
+   <div class="user-panel">
+  <span class="iconify profile" data-icon="iconamoon:profile-fill"></span>
+  <span class="user-name">Admin</span>
+
+  <div class="dropdown-menu">
+    <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+  </div>
+</div>
+  </header>
+
+  <aside class="sidebar-menu">
+    <div class="menu-wrapper">
+      {% if show_reports_button %}
+      <div class="menu-item">
+        <a href="{% url 'application:homepage' %}" class="menu-link">
+          <span class="iconify menu-icon" data-icon="iconoir:reports-solid"></span>
+          <span class="menu-text">Reports</span>
+        </a>
+      </div>
+      {% endif %}
+      {% if show_franchise_button %}
+      <div class="menu-item">
+        <a href="{% url 'application:franchise_list' %}" class="menu-link">
+          <span class="iconify menu-icon" data-icon="fa-solid:school"></span>
+          <span class="menu-text">Franchise</span>
+        </a>
+      </div>
+      {% endif %}
+      {% if show_receipt_button %}
+      <div class="menu-item">
+        <a href="{% url 'application:receipt_search' %}" class="menu-link">
+          <span class="iconify menu-icon" data-icon="fluent:reciept-24-filled"></span>
+          <span class="menu-text">Reciept</span>
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </aside>
+
+  <main class="page-content">
+    <div class="register-wrapper">
+      <div class="left-buttons">
+        <a href="{% url 'application:batch_students' franchise.id batch.id %}" class="backbutton">
+          <span class="iconify" data-icon="weui:back-filled" style="font-size: 20px;"></span>
+        </a>
+         <button class="sidebar-toggle">
+      <span class="iconify" data-icon="mdi:menu" style="font-size: 20px;"></span>
+        </button>
+      </div>
+
+      <div class="right-buttons">
+        {% if show_fee_management_button %}
+        <a href="{% url 'application:student_fee_management' franchise.id batch.id user.id %}" class="viewstudent">
+          Fee Management
+        </a>
+        {% endif %}
+
+        {% if show_edit_button %}
+        <a href="{% url 'application:edit_student_details' franchise.id batch.id user.id %}" class="register-button" style="background-color: #007bff; margin-left: 10px;">
+          Edit Student Details
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+     
+
+    <!-- Student Information Section -->
+    <div class="student-info-section">
+      <h2>Student Details</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Full Name:</label>
+          <span>{{ user.get_full_name|default:"Not provided" }}</span>
+        </div>
+        <!-- <div class="info-item">
+          <label>Username:</label>
+          <span>{{ user.username }}</span>
+        </div> -->
+        <div class="info-item">
+          <label>Registration Number:</label>
+          <span>{{ user_franchise.registration_number|default:"Not assigned" }}</span>
+        </div>
+        <div class="info-item">
+          <label>Email:</label>
+          <span>{{ user.email }}</span>
+        </div>
+         <div class="info-item">
+          <label>Address:</label>
+          <span>{{ user.profile.mailing_address|default:"Not provided"  }}</span>
+        </div>
+        <div class="info-item">
+          <label>Phone Number:</label>
+          <span>{{ user.profile.phone_number|default:"Not provided" }}</span>
+        </div>
+        <div class="info-item">
+          <label>Date Joined:</label>
+          <span>{{ user.date_joined|date:'d/m/Y' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Enrollment Status:</label>
+          <span class="{% if is_enrolled %}enrolled{% else %}not-enrolled{% endif %}">
+            {% if is_enrolled %}Enrolled{% else %}Not Enrolled{% endif %}
+          </span>
+        </div>
+        <form method="post" style="display: inline;">
+        <form method="post" style="display: inline;">
+  {% csrf_token %}
+  {% if is_enrolled %}
+    <button type="submit" name="action" value="unenroll" class="unenroll-btn-alt">
+      <span class="iconify plus-icon" data-icon="vaadin:minus"></span>
+      Unenroll
+    </button>
+  {% else %}
+    <button type="submit" name="action" value="enroll" class="enroll-btn-alt">
+      <span class="iconify plus-icon" data-icon="vaadin:plus"></span>
+      Enroll
+    </button>
+  {% endif %}
+</form>
+
+      </div>
+    </div>
+
+    <!-- Franchise and Batch Information -->
+    <div class="franchise-batch-section">
+      <h2>Franchise & Batch Information</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Franchise:</label>
+          <span>{{ franchise.name }}</span>
+        </div>
+        <div class="info-item">
+          <label>Batch:</label>
+          <span>{{ batch.batch_no }} - {{ batch.course.display_name }}</span>
+        </div>
+        <div class="info-item">
+          <label>Batch Fees:</label>
+          <span>₹{{ batch.fees }}</span>
+        </div>
+        <div class="info-item">
+          <label>Discount:</label>
+          <span>₹{{ student_fee.discount }}</span>
+        </div>
+        <div class="info-item">
+          <label>Net payable Amount:</label>
+          <span>₹{{ student_fee.remaining_amount }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fee Management Section -->
+    <div class="fee-management-section">
+      <h2>Fee Management</h2>
+      <h3>Installments</h3>
+      <h3 style="text-align: center; font-weight: bold; margin-bottom: 15px;">Pending Amount: ₹{{ student_fee.remaining_amount }}</h3>
+      <table class="fee-table">
+        <thead>
+          <tr>
+            <th>Due Date</th>
+            <th>Amount</th>
+            <th>Paid Amount</th>
+            <th>paid within (days)</th>
+            <th>Status</th>
+            <th>Payment Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in installments %}
+          {% with installment=item.installment %}
+          <tr>
+            <td>{{ installment.due_date|date:'d/m/Y' }}</td>
+            <td>₹{{ installment.amount }}</td>
+            <td>₹{{ installment.payed_amount }}</td>
+            <td>{{ installment.repayment_period_days }}</td>
+            <td>
+              <span class="status-{{ installment.status }}">
+                {{ installment.get_status_display }}
+              </span>
+            </td>
+            <td>{% if installment.payment_date %}{{ installment.payment_date|date:'d/m/Y' }}{% else %}-{% endif %}</td>
+          </tr>
+          {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+      
+    </div>
+  </main>
+
+
+
+<script>
+    const userPanel = document.querySelector('.user-panel');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+    const sidebar = document.querySelector('.sidebar-menu');
+    const toggleButton = document.querySelector('.sidebar-toggle');
+
+
+    // Toggle dropdown on click
+    userPanel.addEventListener('click', function(event) {
+      event.stopPropagation(); // prevent click from bubbling
+      dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+      dropdownMenu.style.display = 'none';
+    });
+
+     // Toggle sidebar on button click
+    toggleButton.addEventListener('click', function() {
+      sidebar.classList.toggle('sidebar-open');
+      const icon = toggleButton.querySelector('.iconify');
+      if (sidebar.classList.contains('sidebar-open')) {
+        icon.setAttribute('data-icon', 'mdi:close');
+      } else {
+        icon.setAttribute('data-icon', 'mdi:menu');
+      }
+    });
+</script>
+
+</body>
+</html>

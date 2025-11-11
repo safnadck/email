@@ -1,0 +1,445 @@
+{% load static %}
+{% load permission_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grant Special Access</title>
+    <link rel="stylesheet" href="{% static 'css/special_access_register.css' %}">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="navbar">
+        <div class="navbar-left">
+            <img src="{% static 'images/tutorlogo.png' %}" alt="Tutor Logo" class="brand-logo">
+        </div>
+        <div class="user-panel">
+            <span class="iconify profile" data-icon="iconamoon:profile-fill"></span>
+            <span class="user-name">{{ user.username }}</span>
+            <div class="dropdown-menu">
+                <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+  <aside class="sidebar-menu">
+    <div class="menu-wrapper">
+
+            <!-- Reports Menu -->
+      {% if user|can_access:"view_reports" or user.is_superuser %}
+      <div class="menu-item">
+        <a href="{% url 'application:homepage' %}" class="menu-link">
+          <span class="iconify menu-icon" data-icon="iconoir:reports-solid"></span>
+          <span class="menu-text">Reports</span>
+        </a>
+      </div>
+      {% endif %}
+      
+      <!-- Franchise Menu -->
+      {% if user|can_access:"view_franchise" or user.is_superuser %}
+      <div class="menu-item">
+        <a href="{% url 'application:franchise_list' %}" class="menu-link">
+          <span class="iconify menu-icon" data-icon="fa-solid:school"></span>
+          <span class="menu-text">Franchise</span>
+        </a>
+      </div>
+      {% endif %}
+
+      <!-- Receipt Menu -->
+      {% if user|can_access:"process_payment" or user.is_superuser %}
+      <div class="menu-item">
+        <a href="{% url 'application:receipt_search' %}" class="menu-link">
+          <span class="iconify menu-icon" data-icon="fluent:reciept-24-filled"></span>
+          <span class="menu-text">Receipt</span>
+        </a>
+      </div>
+      {% endif %}
+
+    </div>
+  </aside>
+
+    <!-- Main Content -->
+    <main class="page-content">
+        <div class="register-wrapper">
+            <div class="left-buttons">
+                <a href="{% url 'application:homepage' %}" class="backbutton">
+                    <span class="iconify" data-icon="weui:back-filled" style="font-size: 20px;"></span>
+                </a>
+                 <button class="sidebar-toggle">
+      <span class="iconify" data-icon="mdi:menu" style="font-size: 20px;"></span>
+        </button>
+            </div>
+            <div class="right-buttons">
+                <!-- Additional buttons can be added here if needed -->
+            </div>
+        </div>
+
+        <div class="content">
+            <h1>Grant Special Access</h1>
+
+            <div class="forms-container">
+                <div class="form-section">
+                    <div class="form-card">
+                        <h2>Register New User with Special Access</h2>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="id_username">Username:</label>
+                                <input type="text" name="username" id="id_username" placeholder="Enter username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_full_name">Full Name:</label>
+                                <input type="text" name="full_name" id="id_full_name" placeholder="Enter full name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_email">Email:</label>
+                                <input type="email" name="email" id="id_email" placeholder="Enter email address" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_phone">Phone:</label>
+                                <input type="text" name="phone" id="id_phone" placeholder="Enter phone number" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_password">Password:</label>
+                                <input type="password" name="password" id="id_password" placeholder="Create a password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_mailing_address">Address:</label>
+                                <textarea name="mailing_address" id="id_mailing_address" placeholder="Enter mailing address" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.group.id_for_label }}">Role:</label>
+                                {{ form.group }}
+                            </div>
+                            <div class="form-group">
+                                <label>Franchises:</label>
+                                <div class="dropdown-container dropdown-dark">
+                                    <div class="dropdown-header" id="franchiseDropdownHeader">
+                                        <span class="dropdown-text">Select franchises</span>
+                                        <span class="iconify dropdown-arrow" data-icon="mdi:chevron-down"></span>
+                                    </div>
+                                    <div class="dropdown-menu" id="franchiseDropdownMenu">
+                                        <div class="dropdown-item select-all-item">
+                                            <input type="checkbox" id="selectAllFranchises">
+                                            <label for="selectAllFranchises">Select All Franchises</label>
+                                        </div>
+                                        {% for checkbox in form.allowed_franchises %}
+                                        <div class="dropdown-item">
+                                            {{ checkbox.tag }}
+                                            <label for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <small class="form-text text-muted">Leave empty to grant access to all franchises</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Batches:</label>
+                                <div class="dropdown-container dropdown-dark">
+                                    <div class="dropdown-header" id="batchDropdownHeader">
+                                        <span class="dropdown-text">Select batches</span>
+                                        <span class="iconify dropdown-arrow" data-icon="mdi:chevron-down"></span>
+                                    </div>
+                                    <div class="dropdown-menu" id="batchDropdownMenu">
+                                        <div class="dropdown-item select-all-item">
+                                            <input type="checkbox" id="selectAllBatches">
+                                            <label for="selectAllBatches">Select All Batches</label>
+                                        </div>
+                                        {% for checkbox in form.allowed_batches %}
+                                        <div class="dropdown-item" data-batch-id="{{ checkbox.data.value }}">
+                                            {{ checkbox.tag }}
+                                            <label for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <small class="form-text text-muted">Leave empty to grant access to all batches (filtered by selected franchises)</small>
+                            </div>
+                            <button type="submit" class="register-button">Register User</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Users with Special Access</h2>
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Granted By</th>
+                            <th>Granted At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for special_user in special_users %}
+                        <tr>
+                            <td>{{ special_user.user.username }}</td>
+                            <td>{{ special_user.user.email }}</td>
+                            <td>{% if special_user.granted_by %}{{ special_user.granted_by.username }}{% else %}N/A{% endif %}</td>
+                            <td>{{ special_user.granted_at|date:'d/m/Y' }}</td>
+                            <td>
+                                <a href="{% url 'application:edit_special_access_user' special_user.user.id %}" class="btn btn-primary btn-sm btnview">Edit</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // User panel dropdown functionality
+        const userPanel = document.querySelector('.user-panel');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        const sidebar = document.querySelector('.sidebar-menu');
+        const toggleButton = document.querySelector('.sidebar-toggle');
+
+        userPanel.addEventListener('click', function(event) {
+            event.stopPropagation();
+            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', function() {
+            dropdownMenu.style.display = 'none';
+        });
+
+             // Toggle sidebar on button click
+    toggleButton.addEventListener('click', function() {
+      sidebar.classList.toggle('sidebar-open');
+      const icon = toggleButton.querySelector('.iconify');
+      if (sidebar.classList.contains('sidebar-open')) {
+        icon.setAttribute('data-icon', 'mdi:close');
+      } else {
+        icon.setAttribute('data-icon', 'mdi:menu');
+      }
+    });
+
+        // Dropdown functionality for franchises and batches
+        const franchiseDropdownHeader = document.getElementById('franchiseDropdownHeader');
+        const franchiseDropdownMenu = document.getElementById('franchiseDropdownMenu');
+        const batchDropdownHeader = document.getElementById('batchDropdownHeader');
+        const batchDropdownMenu = document.getElementById('batchDropdownMenu');
+
+        // Toggle franchise dropdown
+        franchiseDropdownHeader.addEventListener('click', function() {
+            franchiseDropdownMenu.classList.toggle('open');
+            franchiseDropdownHeader.classList.toggle('open');
+            batchDropdownMenu.classList.remove('open');
+            batchDropdownHeader.classList.remove('open');
+        });
+
+        // Toggle batch dropdown
+        batchDropdownHeader.addEventListener('click', function() {
+            batchDropdownMenu.classList.toggle('open');
+            batchDropdownHeader.classList.toggle('open');
+            franchiseDropdownMenu.classList.remove('open');
+            franchiseDropdownHeader.classList.remove('open');
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!franchiseDropdownHeader.contains(event.target) && !franchiseDropdownMenu.contains(event.target)) {
+                franchiseDropdownMenu.classList.remove('open');
+                franchiseDropdownHeader.classList.remove('open');
+            }
+            if (!batchDropdownHeader.contains(event.target) && !batchDropdownMenu.contains(event.target)) {
+                batchDropdownMenu.classList.remove('open');
+                batchDropdownHeader.classList.remove('open');
+            }
+        });
+
+        // Select All functionality for franchises
+        const selectAllFranchises = document.getElementById('selectAllFranchises');
+        const franchiseCheckboxes = document.querySelectorAll('#franchiseDropdownMenu input[type="checkbox"]:not(#selectAllFranchises)');
+
+        selectAllFranchises.addEventListener('change', function() {
+            franchiseCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllFranchises.checked;
+            });
+            updateFranchiseDropdownText();
+            filterBatchesByFranchises(); // Update batches when franchise selection changes
+        });
+
+        // Make entire dropdown item clickable for franchises
+        const franchiseDropdownItems = document.querySelectorAll('#franchiseDropdownMenu .dropdown-item');
+        franchiseDropdownItems.forEach(item => {
+            item.addEventListener('click', function(event) {
+                if (event.target.type !== 'checkbox') {
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        // Trigger change event to update select all and filtering
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                }
+            });
+        });
+
+        // Update franchise dropdown text based on selection
+        function updateFranchiseDropdownText() {
+            const selectedFranchises = Array.from(franchiseCheckboxes).filter(cb => cb.checked);
+            const dropdownText = franchiseDropdownHeader.querySelector('.dropdown-text');
+            
+            if (selectedFranchises.length === 0) {
+                dropdownText.textContent = 'Select franchises';
+            } else if (selectedFranchises.length === franchiseCheckboxes.length) {
+                dropdownText.textContent = 'All franchises selected';
+            } else {
+                dropdownText.textContent = `${selectedFranchises.length} franchise(s) selected`;
+            }
+        }
+
+        // Add event listeners to franchise checkboxes
+        franchiseCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // Update select all checkbox state
+                const allChecked = Array.from(franchiseCheckboxes).every(cb => cb.checked);
+                selectAllFranchises.checked = allChecked;
+                
+                updateFranchiseDropdownText();
+                filterBatchesByFranchises(); // Update batches based on franchise selection
+            });
+        });
+
+        // Select All functionality for batches
+        const selectAllBatches = document.getElementById('selectAllBatches');
+        const batchCheckboxes = document.querySelectorAll('#batchDropdownMenu input[type="checkbox"]:not(#selectAllBatches)');
+
+        selectAllBatches.addEventListener('change', function() {
+            batchCheckboxes.forEach(checkbox => {
+                if (checkbox.closest('.dropdown-item').style.display !== 'none') {
+                    checkbox.checked = selectAllBatches.checked;
+                }
+            });
+            updateBatchDropdownText();
+        });
+
+        // Make entire dropdown item clickable for batches
+        const batchDropdownItems = document.querySelectorAll('#batchDropdownMenu .dropdown-item');
+        batchDropdownItems.forEach(item => {
+            item.addEventListener('click', function(event) {
+                if (event.target.type !== 'checkbox') {
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        // Trigger change event to update select all
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                }
+            });
+        });
+
+        // Update batch dropdown text based on selection
+        function updateBatchDropdownText() {
+            const visibleBatchCheckboxes = Array.from(batchCheckboxes).filter(cb => 
+                cb.closest('.dropdown-item').style.display !== 'none'
+            );
+            const selectedBatches = visibleBatchCheckboxes.filter(cb => cb.checked);
+            const dropdownText = batchDropdownHeader.querySelector('.dropdown-text');
+            
+            if (selectedBatches.length === 0) {
+                dropdownText.textContent = 'Select batches';
+            } else if (selectedBatches.length === visibleBatchCheckboxes.length) {
+                dropdownText.textContent = 'All batches selected';
+            } else {
+                dropdownText.textContent = `${selectedBatches.length} batch(es) selected`;
+            }
+        }
+
+        // Add event listeners to batch checkboxes
+        batchCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // Update select all checkbox state
+                const visibleBatchCheckboxes = Array.from(batchCheckboxes).filter(cb => 
+                    cb.closest('.dropdown-item').style.display !== 'none'
+                );
+                const allChecked = visibleBatchCheckboxes.every(cb => cb.checked);
+                selectAllBatches.checked = allChecked;
+                
+                updateBatchDropdownText();
+            });
+        });
+
+        // Store batch-franchise mapping from server
+        let batchFranchiseMap = JSON.parse('{{ batch_franchise_map|escapejs }}');
+
+        // Filter batches based on selected franchises
+        function filterBatchesByFranchises() {
+            const selectedFranchiseIds = Array.from(franchiseCheckboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+            
+            const batchItems = document.querySelectorAll('#batchDropdownMenu .dropdown-item:not(.select-all-item)');
+            
+            if (selectedFranchiseIds.length === 0) {
+                // If no franchises selected, show all batches
+                batchItems.forEach(item => {
+                    item.style.display = 'flex';
+                });
+            } else {
+                // Show only batches that belong to selected franchises
+                batchItems.forEach(item => {
+                    const franchiseId = item.getAttribute('data-franchise-id');
+                    const batchCheckbox = item.querySelector('input[type="checkbox"]');
+                    
+                    if (franchiseId && selectedFranchiseIds.includes(franchiseId)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                        if (batchCheckbox) {
+                            batchCheckbox.checked = false; // Uncheck hidden batches
+                        }
+                    }
+                });
+            }
+            
+            // Update batch dropdown text and select all state
+            updateBatchDropdownText();
+            updateBatchSelectAllState();
+        }
+
+        // Update batch select all checkbox state
+        function updateBatchSelectAllState() {
+            const visibleBatchCheckboxes = Array.from(batchCheckboxes).filter(cb => 
+                cb.closest('.dropdown-item').style.display !== 'none'
+            );
+            
+            if (visibleBatchCheckboxes.length === 0) {
+                selectAllBatches.checked = false;
+                selectAllBatches.disabled = true;
+            } else {
+                selectAllBatches.disabled = false;
+                const allChecked = visibleBatchCheckboxes.every(cb => cb.checked);
+                selectAllBatches.checked = allChecked;
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize dropdown texts
+            updateFranchiseDropdownText();
+            updateBatchDropdownText();
+
+            // Set data-franchise-id attributes for batch items
+            const batchItems = document.querySelectorAll('#batchDropdownMenu .dropdown-item:not(.select-all-item)');
+            batchItems.forEach(item => {
+                const batchId = item.getAttribute('data-batch-id');
+                const franchiseId = batchFranchiseMap[batchId];
+                if (franchiseId) {
+                    item.setAttribute('data-franchise-id', franchiseId);
+                }
+            });
+
+            // Initial batch filtering
+            filterBatchesByFranchises();
+        });
+    </script>
+</body>
+</html>

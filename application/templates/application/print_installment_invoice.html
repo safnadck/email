@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - {{ user.username }} - Installment {{ installment.id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #000;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .invoice-details {
+            margin-bottom: 20px;
+        }
+        .invoice-details p {
+            margin: 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .summary {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        @media print {
+            body {
+                margin: 0;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Fee Invoice</h1>
+    </div>
+
+    <div class="invoice-details">
+        <h2>Student: {{ user.username }}</h2>
+        <p><strong>Batch:</strong> {{ batch.batch_no }}</p>
+        <p><strong>Franchise:</strong> {{ franchise.name }}</p>
+        <p><strong>Batch Fee Management Discount:</strong> ₹{{ fee_management.discount }}</p>
+        <p><strong>Total Batch Fees:</strong> ₹{{ batch.fees }}</p>
+        <p><strong>Total Paid So Far:</strong> ₹{{ total_paid }}</p>
+        <p><strong>Remaining Amount:</strong> ₹{{ fee_management.remaining_amount }}</p>
+    </div>
+
+    <h3>Installment Details</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Installment Due Date</th>
+                <th>Amount</th>
+                <th>Amount Paid</th>
+                <th>Repayment Days</th>
+                <th>Status</th>
+                <th>Payment Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ installment.due_date|date:'d/m/Y' }}</td>
+                <td>₹{{ installment.amount }}</td>
+                <td>₹{{ installment.payed_amount }}</td>
+                <td>{{ installment.repayment_period_days }}</td>
+                <td>{{ installment.status|title }}</td>
+                <td>{% if installment.payment_date %}{{ installment.payment_date|date:'d/m/Y' }}{% else %}-{% endif %}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="summary">
+        <h3>Payment Summary</h3>
+        <p><strong>Installment Amount:</strong> ₹{{ installment.amount }}</p>
+        <p><strong>Amount Paid:</strong> ₹{{ installment.payed_amount }}</p>
+        <p><strong>Installment Balance:</strong> ₹{{ installment_balance }}</p>
+    </div>
+
+    <script>
+        window.onload = function() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

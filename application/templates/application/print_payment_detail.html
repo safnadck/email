@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Receipt - {{ user_franchise.user.get_full_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #16376D;
+            padding-bottom: 20px;
+        }
+        .header h1 {
+            color: #16376D;
+            margin: 0;
+            font-size: 28px;
+        }
+        .header p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .payment-info {
+            margin-bottom: 30px;
+            background-color: #e8f5e8;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+        .payment-info h2 {
+            color: #28a745;
+            margin-top: 0;
+        }
+        .payment-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+        }
+        .payment-item.total {
+            font-weight: bold;
+            background-color: #28a745;
+            color: white;
+        }
+        .student-info {
+            margin-bottom: 30px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .student-info h2 {
+            color: #16376D;
+            margin-top: 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        .info-item label {
+            font-weight: bold;
+            color: #16376D;
+        }
+        .info-item span {
+            color: #333;
+        }
+        .recent-payments {
+            margin-top: 30px;
+        }
+        .recent-payments h2 {
+            color: #16376D;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .recent-payments-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+        }
+        .recent-payments-table th,
+        .recent-payments-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .recent-payments-table th {
+            background-color: #16376D;
+            color: white;
+            font-weight: bold;
+        }
+        .recent-payments-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+        @media print {
+            body {
+                margin: 0;
+                padding: 15px;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Payment Receipt</h1>
+        <p>Payment ID: {{ user_franchise.id }}-{{ payment_date|date:"Ymd" }}</p>
+        <p>Date: {{ payment_date|date:"d/m/Y" }}</p>
+    </div>
+
+    <div class="student-info">
+        <h2>Student Information</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Student Name:</label>
+                <span>{{ user_franchise.user.get_full_name }}</span>
+            </div>
+            <div class="info-item">
+                <label>Registration Number:</label>
+                <span>{{ user_franchise.registration_number }}</span>
+            </div>
+            <div class="info-item">
+                <label>Email:</label>
+                <span>{{ user_franchise.user.email }}</span>
+            </div>
+            <div class="info-item">
+                <label>Phone:</label>
+                <span>{{ user_profile.phone_number|default:"N/A" }}</span>
+            </div>
+            <div class="info-item">
+                <label>Batch:</label>
+                <span>{{ user_franchise.batch.batch_no }}</span>
+            </div>
+            <div class="info-item">
+                <label>Course:</label>
+                <span>{{ user_franchise.batch.course.display_name }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="payment-info">
+        <h2>Payment Details</h2>
+        <div class="payment-details">
+            <div class="payment-item">
+                <label>Payment Amount:</label>
+                <span>₹{{ last_payment_amount }}</span>
+            </div>
+            <div class="payment-item">
+                <label>Payment Date:</label>
+                <span>{{ payment_date|date:"d/m/Y" }}</span>
+            </div>
+            <div class="payment-item total">
+                <label>Status:</label>
+                <span>Payment Applied Successfully</span>
+            </div>
+        </div>
+    </div>
+
+    {% if recent_payments %}
+    <div class="recent-payments">
+        <h2>Installments Updated by Payment</h2>
+        <p style="color: #28a745; font-weight: bold; margin-bottom: 15px;">
+            The payment of ₹{{ last_payment_amount }} has been distributed across the following installments:
+        </p>
+        <table class="recent-payments-table">
+            <thead>
+                <tr>
+                    <th>Due Date</th>
+                    <th>Installment Amount</th>
+                    <th>Paid Amount</th>
+                    <th>Status</th>
+                    <th>Payment Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for installment in recent_payments %}
+                    <tr style="background-color: rgba(40, 167, 69, 0.1);">
+                        <td>{{ installment.due_date|date:"d/m/Y" }}</td>
+                        <td>₹{{ installment.amount }}</td>
+                        <td style="color: #28a745; font-weight: bold;">₹{{ installment.payed_amount|floatformat:2 }}</td>
+                        <td>
+                            <span class="status-{{ installment.status }}" style="background-color: #28a745; color: white;">
+                                {{ installment.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{% if installment.payment_date %}{{ installment.payment_date|date:"d/m/Y" }}{% else %}-{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="recent-payments">
+        <h2>Payment Applied</h2>
+        <p style="color: #666; font-style: italic;">
+            The payment of ₹{{ last_payment_amount }} has been recorded but no specific installment details are available.
+        </p>
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        <p>This is a computer-generated payment receipt. No signature required.</p>
+        <p>Generated on {% now "d/m/Y H:i" %}</p>
+    </div>
+
+    <script>
+        window.onload = function() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
