@@ -78,12 +78,15 @@
         </div>
         {% endif %}
 
-        <div class="menu-item">
-            <a href="{% url 'application:email_template_list' %}" class="menu-link">
-                <span class="iconify menu-icon" data-icon="mdi:email-edit-outline"></span>
-                <span class="menu-text">Email</span>
-            </a>
-            </div>
+      {% if request.user.is_superuser %}
+<div class="menu-item">
+    <a href="{% url 'application:email_template_list' %}" class="menu-link">
+        <span class="iconify menu-icon" data-icon="mdi:email-edit-outline"></span>
+        <span class="menu-text">Email</span>
+    </a>
+</div>
+{% endif %}
+
 
     </div>
   </aside>
